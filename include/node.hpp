@@ -1,20 +1,18 @@
 #pragma once
 
 #include <string>
-#include "trade.hpp"
+#include <trade.hpp>
 
-class Node
+struct Node
 {
-    private:
-        int numKeys;
-        bool isLeaf;
-        Trade* keys;
-        Node** children; // Vetor dinâmico de objetos "Node", por isso o asterisco duplo
-        Node* next;
+    int numKeys;        
+    bool isLeaf;        
+    Trade* keys;        
+    Node** children; // Vetor dinâmico de objetos "Node", por isso o asterisco duplo
+    Node* next;    
 
-        Node(int degree, bool isLeaf);
-        ~Node();
+    Node(int degree, bool isLeaf);
+    ~Node();
 
-    public:
-        int searchKey(Trade key);
+    int searchKey(Trade key);
 }
