@@ -14,6 +14,7 @@ class Trade
         char status;
 
     public:
+        Trade(long timeref, std::string account, std::string code, std::string countryCode, std::string productType, std::string value, char status);
         long getTimeref() const;
         void setTimeref(long value);
         const std::string& getAccount() const;
