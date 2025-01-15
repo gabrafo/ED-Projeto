@@ -7,4 +7,7 @@ struct Header
     int qntSets;
     Set* firstSet;
     Set* nextAvailableSet;
+
+    Header();
+    ~Header();
 }
