@@ -108,3 +108,42 @@ bool operator!=(const Trade& other) const
 {
     return !(*this == other);
 }
+
+void serialize(std::ofstream& out) const 
+{
+    out.write(reinterpret_cast<const char*>(&timeref), sizeof(timeref));
+    size_t size = account.size();
+    out.write(reinterpret_cast<const char*>(&size), sizeof(size));
+    out.write(account.c_str(), size);
+    size = code.size();
+    out.write(reinterpret_cast<const char*>(&size), sizeof(size));
+    out.write(code.c_str(), size);
+    size = countryCode.size();
+    out.write(reinterpret_cast<const char*>(&size), sizeof(size));
+    out.write(countryCode.c_str(), size);
+    size = productType.size();
+    out.write(reinterpret_cast<const char*>(&size), sizeof(size));
+    out.write(productType.c_str(), size);
+    out.write(reinterpret_cast<const char*>(&value), sizeof(value));
+    out.write(reinterpret_cast<const char*>(&status), sizeof(status));
+}
+
+void deserialize(std::ifstream& in) 
+{
+    in.read(reinterpret_cast<char*>(&timeref), sizeof(timeref));
+    size_t size;
+    in.read(reinterpret_cast<char*>(&size), sizeof(size));
+    account.resize(size);
+    in.read(&account[0], size);
+    in.read(reinterpret_cast<char*>(&size), sizeof(size));
+    code.resize(size);
+    in.read(&code[0], size);
+    in.read(reinterpret_cast<char*>(&size), sizeof(size));
+    countryCode.resize(size);
+    in.read(&countryCode[0], size);
+    in.read(reinterpret_cast<char*>(&size), sizeof(size));
+    productType.resize(size);
+    in.read(&productType[0], size);
+    in.read(reinterpret_cast<char*>(&value), sizeof(value));
+    in.read(reinterpret_cast<char*>(&status), sizeof(status));
+}
