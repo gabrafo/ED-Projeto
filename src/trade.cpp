@@ -59,3 +59,33 @@ char Trade::getStatus() const {
 void Trade::setStatus(char newStatus) {
     status = newStatus;
 }
+
+// Sobrecarga do operador < para comparar por 'code'
+bool operator<(const Trade& other) const {
+    return code < other.code;  // Compara o campo 'code' lexicograficamente
+}
+
+// Sobrecarga do operador >, baseado no operador <
+bool operator>(const Trade& other) const {
+    return other < *this;
+}
+
+// Sobrecarga do operador <=, usando < e ==
+bool operator<=(const Trade& other) const {
+    return !(other < *this);
+}
+
+// Sobrecarga do operador >=, usando < e ==
+bool operator>=(const Trade& other) const {
+    return !(*this < other);
+}
+
+// Sobrecarga do operador ==, para permitir comparação de igualdade
+bool operator==(const Trade& other) const {
+    return code == other.code;
+}
+
+// Sobrecarga do operador !=, para permitir comparação de desigualdade
+bool operator!=(const Trade& other) const {
+    return !(*this == other);
+}
