@@ -35,4 +35,6 @@ class Trade
         bool operator>=(const Trade& other) const;
         bool operator==(const Trade& other) const;
         bool operator!=(const Trade& other) const;
+        void serialize(std::ofstream& out) const;
+        void deserialize(std::ifstream& in);
 }

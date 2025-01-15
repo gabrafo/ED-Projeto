@@ -74,42 +74,42 @@ void Trade::setStatus(char newStatus)
 }
 
 // Sobrecarga do operador < para comparar por 'code'
-bool operator<(const Trade& other) const 
+bool Trade::operator<(const Trade& other) const 
 {
     return code < other.code;  // Compara o campo 'code' lexicograficamente
 }
 
 // Sobrecarga do operador >, baseado no operador <
-bool operator>(const Trade& other) const 
+bool Trade::operator>(const Trade& other) const 
 {
     return other < *this;
 }
 
 // Sobrecarga do operador <=, usando < e ==
-bool operator<=(const Trade& other) const 
+bool Trade::operator<=(const Trade& other) const 
 {
     return !(other < *this);
 }
 
 // Sobrecarga do operador >=, usando < e ==
-bool operator>=(const Trade& other) const 
+bool Trade::operator>=(const Trade& other) const 
 {
     return !(*this < other);
 }
 
 // Sobrecarga do operador ==, para permitir comparação de igualdade
-bool operator==(const Trade& other) const 
+bool Trade::operator==(const Trade& other) const 
 {
     return code == other.code;
 }
 
 // Sobrecarga do operador !=, para permitir comparação de desigualdade
-bool operator!=(const Trade& other) const 
+bool Trade::operator!=(const Trade& other) const 
 {
     return !(*this == other);
 }
 
-void serialize(std::ofstream& out) const 
+void Trade::serialize(std::ofstream& out) const 
 {
     out.write(reinterpret_cast<const char*>(&timeref), sizeof(timeref));
     size_t size = account.size();
@@ -128,7 +128,7 @@ void serialize(std::ofstream& out) const
     out.write(reinterpret_cast<const char*>(&status), sizeof(status));
 }
 
-void deserialize(std::ifstream& in) 
+void Trade::deserialize(std::ifstream& in) 
 {
     in.read(reinterpret_cast<char*>(&timeref), sizeof(timeref));
     size_t size;
