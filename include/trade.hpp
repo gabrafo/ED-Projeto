@@ -29,4 +29,10 @@ class Trade
         void setValue(float newValue);
         char getStatus() const;
         void setStatus(char newStatus);
+        bool operator<(const Trade& other) const;
+        bool operator<=(const Trade& other) const;
+        bool operator>(const Trade& other) const;
+        bool operator>=(const Trade& other) const;
+        bool operator==(const Trade& other) const;
+        bool operator!=(const Trade& other) const;
 }
