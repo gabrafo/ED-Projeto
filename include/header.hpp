@@ -5,8 +5,8 @@
 struct Header
 {
     int qntSets;
-    Set* firstSet;
-    Set* nextAvailableSet;
+    int firstSetId;
+    int nextAvailableSetId;
 
     Header();
     ~Header();

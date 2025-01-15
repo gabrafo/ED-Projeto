@@ -2,14 +2,17 @@
 
 #include "header.hpp"
 #include "trade.hpp"
-
-const int SET_SIZE = 5000; // Definindo arbitrariamente a quantidade de elementos
+#include "utils.hpp"
 
 struct Set
 {
+    int setId;
     Trade[SET_SIZE] elements;
     int qntElements;
-    Set* next;
+    int nextISetId;
 
-    int searchKey(Trade key);
+    Set();
+    Set(int setId, int qntElements, int nextISetId);
+
+    int searchKey(const Trade& key) const;
 }

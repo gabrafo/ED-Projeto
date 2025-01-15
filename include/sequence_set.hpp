@@ -7,6 +7,8 @@ class SequenceSet
 {
     private:
         Header header;
+        void splitSet(int setId);
+        void accessSetById(int setId);
 
     public:
         void insert(Trade element);
