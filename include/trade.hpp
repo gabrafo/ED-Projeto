@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <fstream>
 
 class Trade
 {
@@ -11,10 +12,11 @@ class Trade
         std::string countryCode;
         std::string productType;
         float value;
-        char status;
+        std::string status;
 
     public:
-        Trade(long timeref, std::string account, std::string code, std::string countryCode, std::string productType, std::string value, char status);
+        Trade();
+        Trade(long timeref, std::string account, std::string code, std::string countryCode, std::string productType, float value, std::string status);
         long getTimeref() const;
         void setTimeref(long value);
         const std::string& getAccount() const;
@@ -27,8 +29,8 @@ class Trade
         void setProductType(const std::string& value);
         float getValue() const;
         void setValue(float newValue);
-        char getStatus() const;
-        void setStatus(char newStatus);
+        std::string getStatus() const;
+        void setStatus(std::string newStatus);
         bool operator<(const Trade& other) const;
         bool operator<=(const Trade& other) const;
         bool operator>(const Trade& other) const;
@@ -37,4 +39,5 @@ class Trade
         bool operator!=(const Trade& other) const;
         void serialize(std::ofstream& out) const;
         void deserialize(std::ifstream& in);
-}
+        std::string toString() const;
+};

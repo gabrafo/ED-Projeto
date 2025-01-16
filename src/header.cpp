@@ -1,4 +1,5 @@
 #include "header.hpp"
+#include <iostream>
 
 Header::Header()
 {
@@ -7,14 +8,14 @@ Header::Header()
     nextAvailableSetId = 0;
 }
 
-void serialize(std::ofstream& out) const
+void Header::serialize(std::ofstream& out) const
 {
     out.write(reinterpret_cast<const char*>(&qntSets), sizeof(qntSets));
     out.write(reinterpret_cast<const char*>(&firstSetId), sizeof(firstSetId));
     out.write(reinterpret_cast<const char*>(&nextAvailableSetId), sizeof(nextAvailableSetId));
 }
 
-void deserialize(std::ifstream& in)
+void Header::deserialize(std::ifstream& in)
 {
     in.read(reinterpret_cast<char*>(&qntSets), sizeof(qntSets));
     in.read(reinterpret_cast<char*>(&firstSetId), sizeof(firstSetId));
@@ -23,12 +24,12 @@ void deserialize(std::ifstream& in)
 
 void Header::saveHeaderToFile() const
 {
-    std::ofstream out("header.bin", std::ios::binary);
+    std::ofstream out("bins/header.bin", std::ios::binary);
     if (out.is_open()) {
         serialize(out);
         out.close();
     } else {
-        throw std::runtime_error("Unable to open file for writing: " + filename);
+        throw std::runtime_error("Unable to open file for writing.");
     }
 }
 
@@ -39,7 +40,7 @@ void Header::loadHeaderFromFile()
         deserialize(in);
         in.close();
     } else {
-        throw std::runtime_error("Unable to open file for reading: " + filename);
+        throw std::runtime_error("Unable to open file for reading.");
     }
 }
 
@@ -49,7 +50,7 @@ void Header::updateNextAvailableSetId() {
     bool foundEmptySet = false;
     while (currentSetId != -1 and !foundEmptySet) {
         Set currentSet;
-        currentSet.loadSetFromFile(currentSetId);
+        currentSet.loadSetFromFileById(currentSetId);
 
         // Se encontrar um set vazio, use esse ID
         if (currentSet.qntElements == 0) {
@@ -63,6 +64,7 @@ void Header::updateNextAvailableSetId() {
 
     // Se não encontrar nenhum set vazio, incrementa o nextAvailableSetId
     if (!foundEmptySet) {
-        header.nextAvailableSetId = header.qntSets + 1;
+        nextAvailableSetId = qntSets-1;
+        std::cout << "Nenhum conjunto vazio encontrado. Próximo ID disponível: " << nextAvailableSetId << std::endl;
     }
 }

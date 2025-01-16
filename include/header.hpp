@@ -10,9 +10,9 @@ struct Header
     int qntSets;
     int firstSetId;
     int nextAvailableSetId;
+    
 
     Header();  // Construtor padrão
-    ~Header(); // Destruidor (não necessário, mas bom incluir)
 
     // Métodos de serialização
     void serialize(std::ofstream& out) const;

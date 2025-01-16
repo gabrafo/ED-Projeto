@@ -1,7 +1,11 @@
 #include "trade.hpp"
 
-Trade::Trade(long timeref, std::string account, std::string code, std::string countryCode, std::string productType, std::string value, char status)
-: timeref(timeref), account(account), code(code), countryCode(countryCode), productType(productType), value(std::stof(value)), status(status) {}
+Trade::Trade() : timeref(0), account(""), code(""), countryCode(""), productType(""), value(0.0), status(" ") {}
+
+Trade::Trade(long int timeref, std::string account, std::string code, std::string countryCode,
+        std::string productType, float value, std::string status)
+    : timeref(timeref), account(account), code(code), countryCode(countryCode),
+        productType(productType), value(value), status(status) {}
 
 long Trade::getTimeref() const 
 {
@@ -63,12 +67,12 @@ void Trade::setValue(float newValue)
     value = newValue;
 }
 
-char Trade::getStatus() const 
+std::string Trade::getStatus() const 
 {
     return status;
 }
 
-void Trade::setStatus(char newStatus) 
+void Trade::setStatus(std::string newStatus) 
 {
     status = newStatus;
 }
@@ -76,7 +80,7 @@ void Trade::setStatus(char newStatus)
 // Sobrecarga do operador < para comparar por 'code'
 bool Trade::operator<(const Trade& other) const 
 {
-    return code < other.code;  // Compara o campo 'code' lexicograficamente
+    return countryCode < other.countryCode;
 }
 
 // Sobrecarga do operador >, baseado no operador <
@@ -100,7 +104,7 @@ bool Trade::operator>=(const Trade& other) const
 // Sobrecarga do operador ==, para permitir comparação de igualdade
 bool Trade::operator==(const Trade& other) const 
 {
-    return code == other.code;
+    return countryCode == other.countryCode;
 }
 
 // Sobrecarga do operador !=, para permitir comparação de desigualdade
@@ -109,8 +113,7 @@ bool Trade::operator!=(const Trade& other) const
     return !(*this == other);
 }
 
-void Trade::serialize(std::ofstream& out) const 
-{
+void Trade::serialize(std::ofstream& out) const {
     out.write(reinterpret_cast<const char*>(&timeref), sizeof(timeref));
     size_t size = account.size();
     out.write(reinterpret_cast<const char*>(&size), sizeof(size));
@@ -125,11 +128,13 @@ void Trade::serialize(std::ofstream& out) const
     out.write(reinterpret_cast<const char*>(&size), sizeof(size));
     out.write(productType.c_str(), size);
     out.write(reinterpret_cast<const char*>(&value), sizeof(value));
-    out.write(reinterpret_cast<const char*>(&status), sizeof(status));
+    size = status.size();
+    out.write(reinterpret_cast<const char*>(&size), sizeof(size));
+    out.write(status.c_str(), size);
 }
 
-void Trade::deserialize(std::ifstream& in) 
-{
+
+void Trade::deserialize(std::ifstream& in) {
     in.read(reinterpret_cast<char*>(&timeref), sizeof(timeref));
     size_t size;
     in.read(reinterpret_cast<char*>(&size), sizeof(size));
@@ -145,5 +150,19 @@ void Trade::deserialize(std::ifstream& in)
     productType.resize(size);
     in.read(&productType[0], size);
     in.read(reinterpret_cast<char*>(&value), sizeof(value));
-    in.read(reinterpret_cast<char*>(&status), sizeof(status));
+    in.read(reinterpret_cast<char*>(&size), sizeof(size));
+    status.resize(size);
+    in.read(&status[0], size);
+}
+
+std::string Trade::toString() const {
+    std::string str = "Trade: ";
+    str += "timeref: " + std::to_string(timeref) + ", ";
+    str += "account: " + account + ", ";
+    str += "code: " + code + ", ";
+    str += "countryCode: " + countryCode + ", ";
+    str += "productType: " + productType + ", ";
+    str += "value: " + std::to_string(value) + ", ";
+    str += "status: " + status;
+    return str;
 }

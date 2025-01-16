@@ -1,18 +1,23 @@
 #include "set.hpp"
+#include <iostream>
 
-Set(){}
+Set::Set() : setId(0), elements(), qntElements(0), nextSetId(0) {}
 
-Set(int setId, int qntElements, int nextISetId) 
-: setId(setId), qntElements(qntElements), nextISetId(nextISetId){}
+Set::Set(int setId, int qntElements, int nextSetId)
+    : setId(setId), elements(), qntElements(qntElements), nextSetId(nextSetId) {}
 
 void Set::insert(Trade& element){
     int pos = findInsertPosition(element);
+
+    std::cout << "Posição encontrada: " << pos << std::endl;
 
     std::copy_backward(elements + pos,
                     elements + qntElements,
                     elements + qntElements + 1);
     elements[pos] = element;
     qntElements++;
+
+    std::cout << "Cópia feita!" << std::endl;
 }
 
 bool Set::isInRange(const Trade& item) const {
@@ -21,12 +26,12 @@ bool Set::isInRange(const Trade& item) const {
 }
 
 // Usa o elemento mediano como pivô.
-void Set::quicksort(Trade[SET_SIZE]& elements, int start, int end) 
+void Set::quicksort(Trade elements[], int start, int end) 
 {
     if (start >= end) return; // Caso-base: percorreu todos os elementos do vetor.
 
     // Caso recursivo: ainda há elementos a serem ordenados.
-    int pivo = elements[(start + end) / 2];
+    Trade pivo = elements[(start + end) / 2];
     int i = start, j = end;
 
     // Particionamento in-place
@@ -34,7 +39,7 @@ void Set::quicksort(Trade[SET_SIZE]& elements, int start, int end)
         while (elements[i] < pivo) i++;
         while (elements[j] > pivo) j--;
         if (i <= j) {
-            swap(elements[i], elements[j]);
+            std::swap(elements[i], elements[j]);
             i++;
             j--;
         }
@@ -66,11 +71,12 @@ int Set::binarySearch(const Trade& item, int lastPos, bool insertion) const
         }
     }
 
-    return allowInsert ? low : -1; // Retorna a posição para inserção ou -1 (caso apenas queira encontrar o elemento)
+    return insertion ? low : -1; // Retorna a posição para inserção ou -1 (caso apenas queira encontrar o elemento)
 }
 
 int Set::findInsertPosition(const Trade& key) const
 {
+    std::cout << "Procurando posição para inserir elemento..." << std::endl;
     return binarySearch(key, qntElements - 1, true);
 }
 
@@ -85,7 +91,7 @@ void Set::serialize(std::ofstream& out) const
     out.write(reinterpret_cast<const char*>(&nextSetId), sizeof(nextSetId));
     out.write(reinterpret_cast<const char*>(&qntElements), sizeof(qntElements));
     for (int i = 0; i < qntElements; ++i) {
-        trades[i].serialize(out);
+        elements[i].serialize(out);
     }
 }
 
@@ -95,27 +101,27 @@ void Set::deserialize(std::ifstream& in)
     in.read(reinterpret_cast<char*>(&nextSetId), sizeof(nextSetId));
     in.read(reinterpret_cast<char*>(&qntElements), sizeof(qntElements));
     for (int i = 0; i < qntElements; ++i) {
-        trades[i].deserialize(in);
+        elements[i].deserialize(in);
     }
 }
 
 void Set::saveSetToFile() const
 {
-    std::string filename = "package_" + std::to_string(setId) + ".bin";
+    std::string filename = "bins/package_" + std::to_string(setId) + ".bin";
     std::ofstream out(filename, std::ios::binary);
     serialize(out);
 }
 
 void Set::loadSetFromFile()
 {
-    std::string filename = "package_" + std::to_string(setId) + ".bin";
+    std::string filename = "bins/package_" + std::to_string(setId) + ".bin";
     std::ifstream in(filename, std::ios::binary);
     deserialize(in);
 }
 
 void Set::loadSetFromFileById(int setId)
 {
-    std::string filename = "package_" + std::to_string(setId) + ".bin";
+    std::string filename = "bins/package_" + std::to_string(setId) + ".bin";
     std::ifstream in(filename, std::ios::binary);
     deserialize(in);
 }
