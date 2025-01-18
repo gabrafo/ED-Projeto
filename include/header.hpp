@@ -11,7 +11,6 @@ struct Header
     int firstSetId;
     int nextAvailableSetId;
     
-
     Header();  // Construtor padrão
 
     // Métodos de serialização

@@ -47,24 +47,27 @@ void Header::loadHeaderFromFile()
 void Header::updateNextAvailableSetId() {
     int currentSetId = firstSetId;
 
-    bool foundEmptySet = false;
-    while (currentSetId != -1 and !foundEmptySet) {
+    bool emptySetFound = false;
+
+    while (currentSetId != -1 and !emptySetFound) {
         Set currentSet;
         currentSet.loadSetFromFileById(currentSetId);
 
         // Se encontrar um set vazio, use esse ID
         if (currentSet.qntElements == 0) {
             nextAvailableSetId = currentSetId;
-            foundEmptySet = true;
+            std::cout << "Conjunto vazio encontrado. Próximo ID disponível: " << nextAvailableSetId << std::endl;
+            emptySetFound = true;
         }
 
         // Caso contrário, continue verificando o próximo set
         currentSetId = currentSet.nextSetId;
     }
 
-    // Se não encontrar nenhum set vazio, incrementa o nextAvailableSetId
-    if (!foundEmptySet) {
-        nextAvailableSetId = qntSets-1;
+    if(!emptySetFound){
+        nextAvailableSetId = qntSets;
         std::cout << "Nenhum conjunto vazio encontrado. Próximo ID disponível: " << nextAvailableSetId << std::endl;
     }
+
+    saveHeaderToFile();
 }

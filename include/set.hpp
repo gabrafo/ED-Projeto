@@ -25,6 +25,6 @@ struct Set
     void serialize(std::ofstream& out) const;
     void deserialize(std::ifstream& in);
     void saveSetToFile() const;
-    void loadSetFromFile();
     void loadSetFromFileById(int setId);
+    bool isFull() const;
 };

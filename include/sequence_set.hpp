@@ -20,5 +20,6 @@ class SequenceSet
         void insert(Trade element);
         void splitSet(int currentSetId, Trade element);
         Trade search(const Trade& searchKey) const;
+        void debugPrintAllElements() const;
         //void remove(Trade element);
 };

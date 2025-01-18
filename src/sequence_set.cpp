@@ -9,6 +9,8 @@ Header SequenceSet::getHeader() const
 
 Trade SequenceSet::search(const Trade& searchKey) const 
 {
+    std::cout << "Buscando elemento..." << std::endl;
+
     int currentSetId = header.firstSetId;
 
     while (currentSetId != -1) {
@@ -27,71 +29,89 @@ Trade SequenceSet::search(const Trade& searchKey) const
 
         // Se não encontrou, passa para o próximo Set
         currentSetId = currentSet.nextSetId;
+        std::cout << "Passando pelo set de ID: " << currentSet.setId << std::endl;
     }
 
     // Caso o trade não seja encontrado após percorrer todos os sets
     throw std::runtime_error("Trade não encontrado.");
 }
 
-
 void SequenceSet::insert(Trade element)
 {
     std::cout << "Iniciando inserção..." << std::endl;
-    if (header.firstSetId == -1) {
+
+    if(header.qntSets == 0) {
+        Set newSet;
+        // Caso especial: nenhum conjunto ainda existe
+        std::cout << "Primeiro elemento sendo inserido..." << std::endl;
         header.firstSetId = header.nextAvailableSetId;
-        header.nextAvailableSetId++;
-        Set newSet(header.firstSetId, 1, header.nextAvailableSetId);
+        header.qntSets++;
+
+        newSet = Set(header.firstSetId, 0, -1);
         newSet.elements[0] = element;
+        newSet.qntElements++;
+
+        header.nextAvailableSetId++;
         newSet.saveSetToFile();
-        return; // Early-return
+        header.saveHeaderToFile();
+        return;
     }
 
     int currentSetId = header.firstSetId;
+    Set currentSet;
     bool inserted = false;
 
     while (currentSetId != -1 and !inserted) {
-        Set currentSet;
-        currentSet.loadSetFromFile();
+        currentSet.loadSetFromFileById(currentSetId);
 
-        if(currentSet.isInRange(element)){ // Se o set atual está no intervalo de inserção do elemento...
-            insertInSet(currentSet, element);
-            inserted = true;
-            return;
-        }
+        if(currentSet.isInRange(element)){
+            std::cout << "Elemento está no intervalo do set atual!" << std::endl;
 
-        if (!inserted) {
-            Set firstSet;
-            firstSet.loadSetFromFileById(header.firstSetId);
-
-            // Verifica se o elemento é maior que todos ou menor que todos
-            if (element < firstSet.elements[0]) {
-                insertInSet(firstSet, element);
-                inserted = true;
+            if(!currentSet.isFull()){
+                std::cout << "Inserindo em set com espaço disponível..." << std::endl;
+                currentSet.insert(element);
             } else {
-                // Se o elemento for maior que todos, insira no último conjunto
-                int lastSetId = currentSetId-1;
-                Set lastSet;
-                lastSet.loadSetFromFileById(lastSetId);  // Usamos currentSetId, que é o último ID possível
-                insertInSet(lastSet, element);
-                inserted = true;
+                std::cout << "Set atual está cheio!" << std::endl;
+                splitSet(currentSetId, element);
             }
+            inserted = true;
+        } else if(!currentSet.isFull()){
+            if (element < currentSet.elements[0]) {
+                // Expande o intervalo para a esquerda, se possível
+                std::cout << "Elemento menor que o menor do conjunto atual. Inserindo no início..." << std::endl;
+                currentSet.insert(element);
+            } else if (element > currentSet.elements[currentSet.qntElements - 1]) {
+                // Expande o intervalo para a direita, se possível
+                std::cout << "Elemento maior que o maior do conjunto atual. Inserindo no final..." << std::endl;
+                currentSet.insert(element);
+            }
+            inserted = true;
         }
-        
+
         currentSetId = currentSet.nextSetId;
     }
-}
 
-void SequenceSet::insertInSet(Set currentSet, Trade element) 
-{
-    if (currentSet.qntElements < SET_SIZE) {  // Se o conjunto não está cheio
-        currentSet.insert(element); 
-        currentSet.saveSetToFile();
-        header.saveHeaderToFile();
-    } else {
-        // Se o conjunto está cheio, divide o conjunto
-        splitSet(currentSet.setId, element);
+    if(inserted){
+        return;
     }
-    std::cout << "Cabeçalho salvo!" << std::endl;
+
+    currentSetId = currentSet.setId;
+
+    std::cout << "Inserindo em novo set..." << std::endl;
+
+    Set newSet(header.nextAvailableSetId, 0, -1);
+    newSet.elements[0] = element;
+    newSet.qntElements++;
+    
+    newSet.saveSetToFile();
+
+    Set lastSet;
+    lastSet.loadSetFromFileById(currentSetId);
+    lastSet.nextSetId = newSet.setId;
+
+    header.qntSets++;
+    header.updateNextAvailableSetId();
+    lastSet.saveSetToFile();
 }
 
 void SequenceSet::splitSet(int currentSetId, Trade element) 
@@ -103,7 +123,7 @@ void SequenceSet::splitSet(int currentSetId, Trade element)
     int mid = currentSet.qntElements / 2;
 
     int newSetId = header.nextAvailableSetId;
-    Set newSet(newSetId, 0, -1);
+    Set newSet(newSetId, 0, currentSet.nextSetId);
 
     // Copiar metade superior dos elementos para o novo conjunto
     std::copy(currentSet.elements + mid, currentSet.elements + currentSet.qntElements, newSet.elements);
@@ -114,12 +134,10 @@ void SequenceSet::splitSet(int currentSetId, Trade element)
 
     // Inserir o elemento no conjunto correto
     if (element < newSet.elements[0]) {
-        // Inserir no conjunto atual (metade inferior)
-        std::cout << "Inserção na metade inferior..." << std::endl;
+        std::cout << "Elemento pertence à metade inferior. Inserindo no conjunto atual..." << std::endl;
         currentSet.insert(element);
     } else {
-        // Inserir no novo conjunto (metade superior)
-        std::cout << "Inserção na metade superior..." << std::endl;
+        std::cout << "Elemento pertence à metade superior. Inserindo no novo conjunto..." << std::endl;
         newSet.insert(element);
     }
 
@@ -130,13 +148,40 @@ void SequenceSet::splitSet(int currentSetId, Trade element)
     currentSet.saveSetToFile();
     newSet.saveSetToFile();
 
-    std::cout << "Conjuntos salvos!" << std::endl;
-
     header.qntSets++;
+
     header.updateNextAvailableSetId();
+}
 
-    std::cout << "Cabeçalho atualizado!" << std::endl;
+void SequenceSet::debugPrintAllElements() const {
+    std::cout << "--- Início da depuração ---" << std::endl;
+    int currentSetId = header.firstSetId;
 
-    // Atualizar o header para salvar o próximo ID disponível
-    header.saveHeaderToFile();
+    // Percorre todos os conjuntos enquanto houver um conjunto válido
+    while (currentSetId != -1) {
+        Set currentSet;
+        currentSet.loadSetFromFileById(currentSetId);  // Carregar o conjunto atual
+
+        std::cout << "Conjunto ID: " << currentSetId << std::endl;
+        std::cout << "Quantidade de elementos: " << currentSet.qntElements << std::endl;
+
+        // Exibe todos os elementos do conjunto atual
+        std::cout << "Elementos do conjunto " << currentSetId << ": ";
+        for (int i = 0; i < currentSet.qntElements; ++i) {
+            std::cout << currentSet.elements[i].getCountryCode() << " ";
+        }
+        std::cout << std::endl;
+
+        // Se houver um próximo conjunto, exibe o ID do próximo conjunto
+        if (currentSet.nextSetId != -1) {
+            std::cout << "Próximo conjunto ID: " << currentSet.nextSetId << std::endl;
+        } else {
+            std::cout << "Este é o último conjunto." << std::endl;
+        }
+
+        // Passa para o próximo conjunto
+        currentSetId = currentSet.nextSetId;
+    }
+
+    std::cout << "--- Fim da depuração ---" << std::endl;
 }

@@ -58,6 +58,8 @@ void importDataFromCSV(const std::string& filename, SequenceSet& sequenceSet) {
         // Insere o elemento no conjunto
         sequenceSet.insert(trade);
         cout << "Linha " << count << " inserida com sucesso!" << endl;
+        cout << "Elemento " << trade.getCountryCode() << " inserido." << endl;
+        cout << "---" << endl;
         count++;
     }
 }
@@ -86,6 +88,7 @@ void userInterface(SequenceSet& sequenceSet) {
                     importDataFromCSV(filename, sequenceSet);
                     dataImported = true;
                 }
+                sequenceSet.debugPrintAllElements();
                 break;
             }
             case 2: {

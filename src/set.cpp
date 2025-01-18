@@ -9,44 +9,24 @@ Set::Set(int setId, int qntElements, int nextSetId)
 void Set::insert(Trade& element){
     int pos = findInsertPosition(element);
 
-    std::cout << "Posição encontrada: " << pos << std::endl;
-
     std::copy_backward(elements + pos,
                     elements + qntElements,
                     elements + qntElements + 1);
     elements[pos] = element;
     qntElements++;
+    saveSetToFile();
 
-    std::cout << "Cópia feita!" << std::endl;
+    std::cout << "Elementos após a inserção: " << std::endl;
+
+    for (int i = 0; i < qntElements; ++i) {
+        std::cout << elements[i].getCountryCode() << ", ";
+    }
+
+    std::cout << std::endl;
 }
 
 bool Set::isInRange(const Trade& item) const {
-    if (qntElements == 0) return true; // Conjunto vazio, aceita qualquer elemento.
-    return (item >= elements[0] && item <= elements[qntElements - 1]);
-}
-
-// Usa o elemento mediano como pivô.
-void Set::quicksort(Trade elements[], int start, int end) 
-{
-    if (start >= end) return; // Caso-base: percorreu todos os elementos do vetor.
-
-    // Caso recursivo: ainda há elementos a serem ordenados.
-    Trade pivo = elements[(start + end) / 2];
-    int i = start, j = end;
-
-    // Particionamento in-place
-    while (i <= j) {
-        while (elements[i] < pivo) i++;
-        while (elements[j] > pivo) j--;
-        if (i <= j) {
-            std::swap(elements[i], elements[j]);
-            i++;
-            j--;
-        }
-    }
-
-    quicksort(elements, start, j);
-    quicksort(elements, i, end);
+    return (item >= elements[0] and item <= elements[qntElements - 1]);
 }
 
 int Set::binarySearch(const Trade& item, int lastPos, bool insertion) const
@@ -87,6 +67,10 @@ int Set::searchKey(const Trade& key) const
 
 void Set::serialize(std::ofstream& out) const 
 {
+    if (qntElements > SET_SIZE) {
+        std::cerr << "Erro: número de elementos excede o limite permitido!" << std::endl;
+        return;
+    }
     out.write(reinterpret_cast<const char*>(&setId), sizeof(setId));
     out.write(reinterpret_cast<const char*>(&nextSetId), sizeof(nextSetId));
     out.write(reinterpret_cast<const char*>(&qntElements), sizeof(qntElements));
@@ -100,6 +84,12 @@ void Set::deserialize(std::ifstream& in)
     in.read(reinterpret_cast<char*>(&setId), sizeof(setId));
     in.read(reinterpret_cast<char*>(&nextSetId), sizeof(nextSetId));
     in.read(reinterpret_cast<char*>(&qntElements), sizeof(qntElements));
+
+    if (qntElements > SET_SIZE) {
+        std::cerr << "Erro: número de elementos excede o limite permitido!" << std::endl;
+        return;
+    }
+
     for (int i = 0; i < qntElements; ++i) {
         elements[i].deserialize(in);
     }
@@ -110,13 +100,13 @@ void Set::saveSetToFile() const
     std::string filename = "bins/package_" + std::to_string(setId) + ".bin";
     std::ofstream out(filename, std::ios::binary);
     serialize(out);
-}
-
-void Set::loadSetFromFile()
-{
-    std::string filename = "bins/package_" + std::to_string(setId) + ".bin";
-    std::ifstream in(filename, std::ios::binary);
-    deserialize(in);
+    std::cout << "Salvando conjunto com ID: " << std::to_string(setId) << std::endl;
+    std::cout << "package_" << std::to_string(setId) << ".bin" << std::endl;
+    std::cout << "Quantidade de elementos: " << std::to_string(qntElements) << std::endl;
+    std::cout << "Menor countryCode: " << elements[0].getCountryCode() << std::endl;
+    std::cout << "Maior countryCode: " << elements[qntElements-1].getCountryCode() << std::endl;
+    std::cout << "Próximo arquivo: " << std::to_string(nextSetId) << std::endl;
+    std::cout << "Conjunto salvo no arquivo!" << std::endl;
 }
 
 void Set::loadSetFromFileById(int setId)
@@ -124,4 +114,9 @@ void Set::loadSetFromFileById(int setId)
     std::string filename = "bins/package_" + std::to_string(setId) + ".bin";
     std::ifstream in(filename, std::ios::binary);
     deserialize(in);
+}
+
+bool Set::isFull() const
+{
+    return qntElements == SET_SIZE;
 }
