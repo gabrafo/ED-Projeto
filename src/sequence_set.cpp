@@ -20,6 +20,7 @@ Trade SequenceSet::search(const Trade& searchKey) const
         // Verifica se o Set está no intervalo certo para o searchKey
         if (currentSet.isInRange(searchKey)) {
             // Usamos binarySearch para procurar o Trade dentro do Set
+            std::cout << "Está no intervalo de busca!"  << std::endl;
             int foundIndex = currentSet.searchKey(searchKey);
             if (foundIndex != -1) {
                 // Encontramos o Trade no Set
@@ -64,6 +65,7 @@ void SequenceSet::insert(Trade element)
     while (currentSetId != -1 and !inserted) {
         currentSet.loadSetFromFileById(currentSetId);
 
+        // Caso 1: O elemento está no intervalo do conjunto atual
         if(currentSet.isInRange(element)){
             std::cout << "Elemento está no intervalo do set atual!" << std::endl;
 
@@ -75,17 +77,37 @@ void SequenceSet::insert(Trade element)
                 splitSet(currentSetId, element);
             }
             inserted = true;
-        } else if(!currentSet.isFull()){
-            if (element < currentSet.elements[0]) {
-                // Expande o intervalo para a esquerda, se possível
-                std::cout << "Elemento menor que o menor do conjunto atual. Inserindo no início..." << std::endl;
-                currentSet.insert(element);
-            } else if (element > currentSet.elements[currentSet.qntElements - 1]) {
-                // Expande o intervalo para a direita, se possível
-                std::cout << "Elemento maior que o maior do conjunto atual. Inserindo no final..." << std::endl;
-                currentSet.insert(element);
+        } else if (currentSet.nextSetId != -1) { // Caso 2: Verificar relação com o próximo conjunto
+            // Set atual não está no intervalo do elemento e não é o último set
+            Set nextSet;
+            nextSet.loadSetFromFileById(currentSet.nextSetId);
+
+            if (element < nextSet.elements[0]) {
+                std::cout << "Elemento pertence entre os conjuntos ID " 
+                          << currentSet.setId << " e ID " << nextSet.setId << "." << std::endl;
+
+                // Inserir no conjunto atual se houver espaço
+                if (!currentSet.isFull()) {
+                    currentSet.insert(element);
+                    inserted = true;
+                } else {
+                    std::cout << "Conjunto ID " << currentSet.setId 
+                              << " está cheio. Realizando divisão." << std::endl;
+                    splitSet(currentSetId, element);
+                    inserted = true;
+                }
             }
-            inserted = true;
+        } else {
+            std::cout << "Elemento pertence ao último conjunto." << std::endl;
+            if (!currentSet.isFull()) {
+                std::cout << "Inserindo no último conjunto..." << std::endl;
+                currentSet.insert(element);
+                inserted = true;
+            } else {
+                std::cout << "Último conjunto está cheio. Realizando divisão." << std::endl;
+                splitSet(currentSetId, element);
+                inserted = true;
+            }
         }
 
         currentSetId = currentSet.nextSetId;

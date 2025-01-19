@@ -37,6 +37,5 @@ Para executar o programa:
 ## Notas de Desenvolvimento
 Atualmente, estamos em processo de correção de algumas funcionalidades essenciais:
 
-- **Inserção**: O processo de inserção de elementos nos conjuntos ainda está sendo ajustado, especialmente no que se refere à ordenação entre os sets e ao atualização das ligações entre os conjuntos.
-- **Busca**: A busca de elementos nos conjuntos também não está funcionando como esperado, com alguns casos de falhas na percorreção da sequência de sets e na identificação correta de elementos.
-Esses problemas estão sendo corrigidos, e planejamos seguir para a implementação de novas funcionalidades apenas após garantir que as operações de inserção e busca funcionem adequadamente.
+- **Busca**: A busca de elementos nos conjuntos também não está funcionando como esperado, com alguns casos de falhas na identificação de qual Set um elemento pertence, bem como se ele está ou não no Sequence Set.
+

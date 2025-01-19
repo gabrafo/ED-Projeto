@@ -45,7 +45,7 @@ void importDataFromCSV(const std::string& filename, SequenceSet& sequenceSet) {
         // Para o campo value, tentamos fazer a conversão para float
         std::getline(ss, field, ',');
         try {
-            value = std::stof(field);  // Tenta converter para float
+            value = std::stof(field); // Tenta converter para float
         } catch (const std::invalid_argument& e) {
             value = 0.0f;  // Se falhar, atribui 0.0
         }
@@ -150,6 +150,8 @@ void userInterface(SequenceSet& sequenceSet) {
 
                     // Criação do Trade para busca
                     Trade searchTrade(timeref, account, code, countryCode, productType, value, status);
+
+                    std::cout << searchTrade.toString() << std::endl;
 
                     try {
                         Trade foundTrade = sequenceSet.search(searchTrade);
