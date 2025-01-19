@@ -7,6 +7,52 @@ Trade::Trade(long int timeref, std::string account, std::string code, std::strin
     : timeref(timeref), account(account), code(code), countryCode(countryCode),
         productType(productType), value(value), status(status) {}
 
+std::string trim(const std::string& str) {
+    size_t first = str.find_first_not_of(" \t\r\n"); 
+    if (first == std::string::npos) return "";
+    size_t last = str.find_last_not_of(" \t\r\n"); 
+    return str.substr(first, (last - first + 1));
+}
+
+bool Trade::equals(const Trade& other) const {
+
+    if(timeref != other.timeref){
+        std::cout << "Timeref diferente: " << timeref << " != " << other.timeref << std::endl;
+    }
+
+    if(account != other.account){
+        std::cout << "Account diferente: " << account << " != " << other.account << std::endl;
+    }
+
+    if(code != other.code){
+        std::cout << "Code diferente: " << code << " != " << other.code << std::endl;
+    }
+
+    if(countryCode != other.countryCode){
+        std::cout << "CountryCode diferente: " << countryCode << " != " << other.countryCode << std::endl;
+    }
+
+    if(productType != other.productType){
+        std::cout << "ProductType diferente: " << productType << " != " << other.productType << std::endl;
+    }
+
+    if(fabs(value - other.value) > 1e-6){
+        std::cout << "Value diferente: " << value << " != " << other.value << std::endl;
+    }
+
+    if(status != other.status){
+        std::cout << "Status diferente: " << status << " != " << other.status << std::endl;
+    }
+
+    return timeref == other.timeref and
+           trim(account) == trim(other.account) and
+           trim(code) == trim(other.code) and
+           trim(countryCode) == trim(other.countryCode) and
+           trim(productType) == trim(other.productType) and
+           fabs(value - other.value) < 1e-6 and // Comparação de ponto flutuante
+           trim(status) == trim(other.status);
+}
+
 long Trade::getTimeref() const 
 {
     return timeref;
@@ -102,14 +148,12 @@ bool Trade::operator>=(const Trade& other) const
 }
 
 // Sobrecarga do operador ==, para permitir comparação de igualdade
-bool Trade::operator==(const Trade& other) const 
-{
+bool Trade::operator==(const Trade& other) const {
     return countryCode == other.countryCode;
 }
 
 // Sobrecarga do operador !=, para permitir comparação de desigualdade
-bool Trade::operator!=(const Trade& other) const 
-{
+bool Trade::operator!=(const Trade& other) const {
     return !(*this == other);
 }
 

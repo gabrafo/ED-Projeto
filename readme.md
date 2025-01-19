@@ -35,7 +35,4 @@ Para executar o programa:
 ```
 
 ## Notas de Desenvolvimento
-Atualmente, estamos em processo de correção de algumas funcionalidades essenciais:
-
-- **Busca**: A busca de elementos nos conjuntos também não está funcionando como esperado, com alguns casos de falhas na identificação de qual Set um elemento pertence, bem como se ele está ou não no Sequence Set.
-
+Atualmente, estamos em processo de adição da funcionalidade de remover elementos.

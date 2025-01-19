@@ -38,7 +38,11 @@ int Set::binarySearch(const Trade& item, int lastPos, bool insertion) const
         int mid = (low + high)/2;
         Trade guess = elements[mid];
 
-        if (guess == item){
+        if(insertion and guess == item){ // Country code igual
+            return mid; // Acertou!
+        }
+
+        if(!insertion and guess.equals(item)){ // Elemento igual
             return mid; // Acertou!
         }
 

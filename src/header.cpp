@@ -29,7 +29,7 @@ void Header::saveHeaderToFile() const
         serialize(out);
         out.close();
     } else {
-        throw std::runtime_error("Unable to open file for writing.");
+        throw std::runtime_error("Erro ao salvar arquivo de cabeçalho.");
     }
 }
 
@@ -40,7 +40,7 @@ void Header::loadHeaderFromFile()
         deserialize(in);
         in.close();
     } else {
-        throw std::runtime_error("Unable to open file for reading.");
+        throw std::runtime_error("Erro ao ler arquivo de cabeçalho.");
     }
 }
 

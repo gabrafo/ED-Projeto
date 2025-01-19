@@ -46,7 +46,8 @@ void importDataFromCSV(const std::string& filename, SequenceSet& sequenceSet) {
         std::getline(ss, field, ',');
         try {
             value = std::stof(field); // Tenta converter para float
-        } catch (const std::invalid_argument& e) {
+        } catch (const std::invalid_argument& e) { // Intenção é de tratar valores vazios
+            std::cout << "Não foi possível ler o valor float" << std::endl;
             value = 0.0f;  // Se falhar, atribui 0.0
         }
         
