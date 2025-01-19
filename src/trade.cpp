@@ -8,50 +8,15 @@ Trade::Trade(long int timeref, std::string account, std::string code, std::strin
         productType(productType), value(value), status(status) {}
 
 std::string trim(const std::string& str) {
-    size_t first = str.find_first_not_of(" \t\r\n"); 
+    size_t first = str.find_first_not_of(" \t\r\n\""); 
     if (first == std::string::npos) return "";
-    size_t last = str.find_last_not_of(" \t\r\n"); 
+    size_t last = str.find_last_not_of(" \t\r\n\""); 
     return str.substr(first, (last - first + 1));
 }
 
-bool Trade::equals(const Trade& other) const {
-
-    if(timeref != other.timeref){
-        std::cout << "Timeref diferente: " << timeref << " != " << other.timeref << std::endl;
-    }
-
-    if(account != other.account){
-        std::cout << "Account diferente: " << account << " != " << other.account << std::endl;
-    }
-
-    if(code != other.code){
-        std::cout << "Code diferente: " << code << " != " << other.code << std::endl;
-    }
-
-    if(countryCode != other.countryCode){
-        std::cout << "CountryCode diferente: " << countryCode << " != " << other.countryCode << std::endl;
-    }
-
-    if(productType != other.productType){
-        std::cout << "ProductType diferente: " << productType << " != " << other.productType << std::endl;
-    }
-
-    if(fabs(value - other.value) > 1e-6){
-        std::cout << "Value diferente: " << value << " != " << other.value << std::endl;
-    }
-
-    if(status != other.status){
-        std::cout << "Status diferente: " << status << " != " << other.status << std::endl;
-    }
-
-    return timeref == other.timeref and
-           trim(account) == trim(other.account) and
-           trim(code) == trim(other.code) and
-           trim(countryCode) == trim(other.countryCode) and
-           trim(productType) == trim(other.productType) and
-           fabs(value - other.value) < 1e-6 and // Comparação de ponto flutuante
-           trim(status) == trim(other.status);
-}
+bool hasDifference(float a, float b) {
+    return fabs(a - b) > 1e-6;
+}   
 
 long Trade::getTimeref() const 
 {
@@ -123,39 +88,96 @@ void Trade::setStatus(std::string newStatus)
     status = newStatus;
 }
 
-// Sobrecarga do operador < para comparar por 'code'
+// Comparando "countryCode" primeiro (maior prioridade)
 bool Trade::operator<(const Trade& other) const 
 {
-    return countryCode < other.countryCode;
+    if (trim(countryCode) != trim(other.countryCode))
+        return trim(countryCode) < trim(other.countryCode);
+
+    if (trim(code) != trim(other.code))
+        return trim(code) < trim(other.code);
+
+    if (hasDifference(value, other.value))
+        return value < other.value;
+
+    if (timeref != other.timeref)
+        return timeref < other.timeref;
+
+    if (trim(account) != trim(other.account))
+        return trim(account) < trim(other.account);
+
+    if (trim(productType) != trim(other.productType))
+        return trim(productType) < trim(other.productType);
+
+    return trim(status) < trim(other.status);
 }
 
-// Sobrecarga do operador >, baseado no operador <
+// Comparando "countryCode" primeiro (maior prioridade)
 bool Trade::operator>(const Trade& other) const 
 {
-    return other < *this;
+    if (trim(countryCode) != trim(other.countryCode))
+        return trim(countryCode) > trim(other.countryCode);
+
+    if (trim(code) != trim(other.code))
+        return trim(code) > trim(other.code);
+
+    if (hasDifference(value, other.value))
+        return value > other.value;
+
+    if (timeref != other.timeref)
+        return timeref > other.timeref;
+
+    if (trim(account) != trim(other.account))
+        return trim(account) > trim(other.account);
+
+    if (trim(productType) != trim(other.productType))
+        return trim(productType) > trim(other.productType);
+
+    return trim(status) > trim(other.status);
 }
 
-// Sobrecarga do operador <=, usando < e ==
+// Comparação de menor ou igual
 bool Trade::operator<=(const Trade& other) const 
 {
-    return !(other < *this);
+    return !(other < *this); // Usando o operador "<" já modificado
 }
 
-// Sobrecarga do operador >=, usando < e ==
+// Comparação de maior ou igual
 bool Trade::operator>=(const Trade& other) const 
 {
-    return !(*this < other);
+    return !(*this < other); // Usando o operador "<" já modificado
 }
 
-// Sobrecarga do operador ==, para permitir comparação de igualdade
-bool Trade::operator==(const Trade& other) const {
-    return countryCode == other.countryCode;
+// Comparação de igualdade
+bool Trade::operator==(const Trade& other) const 
+{
+    if (trim(countryCode) != trim(other.countryCode))
+        return false;
+
+    if (trim(code) != trim(other.code))
+        return false;
+
+    if (hasDifference(value, other.value))
+        return false;
+
+    if (timeref != other.timeref)
+        return false;
+
+    if (trim(account) != trim(other.account))
+        return false;
+
+    if (trim(productType) != trim(other.productType))
+        return false;
+
+    return trim(status) == trim(other.status);
 }
 
-// Sobrecarga do operador !=, para permitir comparação de desigualdade
-bool Trade::operator!=(const Trade& other) const {
-    return !(*this == other);
+// Comparação de desigualdade
+bool Trade::operator!=(const Trade& other) const 
+{
+    return !(*this == other); // Usando o operador "==" já modificado
 }
+
 
 void Trade::serialize(std::ofstream& out) const {
     out.write(reinterpret_cast<const char*>(&timeref), sizeof(timeref));

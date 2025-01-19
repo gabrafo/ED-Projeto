@@ -9,8 +9,6 @@ Header SequenceSet::getHeader() const
 
 Trade SequenceSet::search(const Trade& searchKey) const 
 {
-    std::cout << "Buscando elemento..." << std::endl;
-
     int currentSetId = header.firstSetId;
 
     while (currentSetId != -1) {
@@ -20,7 +18,6 @@ Trade SequenceSet::search(const Trade& searchKey) const
         // Verifica se o Set está no intervalo certo para o searchKey
         if (currentSet.isInRange(searchKey)) {
             // Usamos binarySearch para procurar o Trade dentro do Set
-            std::cout << "Está no intervalo de busca!"  << std::endl;
             int foundIndex = currentSet.searchKey(searchKey);
             if (foundIndex != -1) {
                 // Encontramos o Trade no Set
@@ -30,11 +27,30 @@ Trade SequenceSet::search(const Trade& searchKey) const
 
         // Se não encontrou, passa para o próximo Set
         currentSetId = currentSet.nextSetId;
-        std::cout << "Passando pelo set de ID: " << currentSet.setId << std::endl;
     }
 
     // Caso o trade não seja encontrado após percorrer todos os sets
     throw std::runtime_error("Trade não encontrado.");
+}
+
+void SequenceSet::remove(Trade element){
+    int currentSetId = header.firstSetId;
+     while (currentSetId != -1) {
+        Set currentSet;
+        currentSet.loadSetFromFileById(currentSetId);
+
+        if (currentSet.isInRange(element)) {
+            // Usamos binarySearch para procurar o Trade dentro do Set
+            int foundIndex = currentSet.searchKey(element);
+            if (foundIndex != -1) {
+                currentSet.deleteElement(foundIndex);
+                return;
+            }
+        }
+
+        // Se não encontrou, passa para o próximo Set
+        currentSetId = currentSet.nextSetId;
+    }
 }
 
 void SequenceSet::insert(Trade element)
@@ -173,6 +189,28 @@ void SequenceSet::splitSet(int currentSetId, Trade element)
     header.qntSets++;
 
     header.updateNextAvailableSetId();
+}
+
+void SequenceSet::debugPrintAllElementsFromPackage(int setId) const {
+    Set currentSet;
+    currentSet.loadSetFromFileById(setId);
+
+    std::cout << "Conjunto ID: " << currentSet.setId << std::endl;
+    std::cout << "Quantidade de elementos: " << currentSet.qntElements << std::endl;
+
+    // Exibe todos os elementos do conjunto atual
+    std::cout << "Elementos do conjunto " << currentSet.setId << ": ";
+    for (int i = 0; i < currentSet.qntElements; ++i) {
+        std::cout << currentSet.elements[i].toString() << std::endl;
+    }
+    std::cout << std::endl;
+
+    // Se houver um próximo conjunto, exibe o ID do próximo conjunto
+    if (currentSet.nextSetId != -1) {
+        std::cout << "Próximo conjunto ID: " << currentSet.nextSetId << std::endl;
+    } else {
+        std::cout << "Este é o último conjunto." << std::endl;
+    }
 }
 
 void SequenceSet::debugPrintAllElements() const {

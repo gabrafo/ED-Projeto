@@ -15,14 +15,50 @@ void Set::insert(Trade& element){
     elements[pos] = element;
     qntElements++;
     saveSetToFile();
+}
 
-    std::cout << "Elementos após a inserção: " << std::endl;
+void Set::deleteElement(int pos){
+    std::copy(elements + pos + 1,
+              elements + qntElements,
+              elements + pos);
+    qntElements--;
 
-    for (int i = 0; i < qntElements; ++i) {
-        std::cout << elements[i].getCountryCode() << ", ";
+    // Verifique se o conjunto atual tem menos que a metade de sua capacidade
+    if(qntElements/2 < SET_SIZE/2){
+
+        // Verificar se o próximo conjunto existe
+        if(nextSetId != -1){
+            Set nextSet;
+            nextSet.loadSetFromFileById(nextSetId);
+
+            // Caso o próximo conjunto tenha mais do que 50% de ocupação, empreste um elemento
+            if(nextSet.qntElements > SET_SIZE/2){
+                elements[qntElements] = nextSet.elements[0];
+                nextSet.deleteElement(0);
+                nextSet.saveSetToFile();
+                qntElements++;
+                saveSetToFile();
+                return;
+            }
+
+            // Caso o próximo conjunto tenha menos que 50% de ocupação
+            // e seja possível juntar os conjuntos, faça a união
+            if(nextSet.qntElements + qntElements <= SET_SIZE){
+                // Junta os conjuntos
+                std::copy(nextSet.elements,
+                          nextSet.elements + nextSet.qntElements,
+                          elements + qntElements);
+                qntElements += nextSet.qntElements;
+                nextSetId = nextSet.nextSetId;
+                nextSet.saveSetToFile();
+                saveSetToFile();
+                return;
+            }
+        }
+
     }
 
-    std::cout << std::endl;
+    saveSetToFile();
 }
 
 bool Set::isInRange(const Trade& item) const {
@@ -37,13 +73,9 @@ int Set::binarySearch(const Trade& item, int lastPos, bool insertion) const
     while(low <= high){
         int mid = (low + high)/2;
         Trade guess = elements[mid];
-
-        if(insertion and guess == item){ // Country code igual
-            return mid; // Acertou!
-        }
-
-        if(!insertion and guess.equals(item)){ // Elemento igual
-            return mid; // Acertou!
+        
+        if(guess == item){
+            return mid; // Elemento já existe
         }
 
         if (guess > item){
@@ -53,8 +85,9 @@ int Set::binarySearch(const Trade& item, int lastPos, bool insertion) const
         if(guess < item){
             low = mid + 1; // Está na parte esquerda
         }
-    }
 
+    }
+    
     return insertion ? low : -1; // Retorna a posição para inserção ou -1 (caso apenas queira encontrar o elemento)
 }
 

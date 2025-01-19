@@ -13,7 +13,8 @@ void displayMenu() {
     cout << "1. Importar dados do CSV\n";
     cout << "2. Inserir novo elemento\n";
     cout << "3. Buscar elemento\n";
-    cout << "4. Sair\n";
+    cout << "4. Remover elemento\n";
+    cout << "5. Sair\n";
 }
 
 void importDataFromCSV(const std::string& filename, SequenceSet& sequenceSet) {
@@ -90,6 +91,10 @@ void userInterface(SequenceSet& sequenceSet) {
                     dataImported = true;
                 }
                 sequenceSet.debugPrintAllElements();
+                int setId;
+                cout << "Digite o ID do conjunto para visualizar: ";
+                cin >> setId;
+                sequenceSet.debugPrintAllElementsFromPackage(setId);
                 break;
             }
             case 2: {
@@ -122,6 +127,7 @@ void userInterface(SequenceSet& sequenceSet) {
                     sequenceSet.insert(newTrade);
                     cout << "Elemento inserido com sucesso!" << endl;
                 }
+                sequenceSet.debugPrintAllElements();
                 break;
             }
             case 3: {
@@ -152,8 +158,6 @@ void userInterface(SequenceSet& sequenceSet) {
                     // Criação do Trade para busca
                     Trade searchTrade(timeref, account, code, countryCode, productType, value, status);
 
-                    std::cout << searchTrade.toString() << std::endl;
-
                     try {
                         Trade foundTrade = sequenceSet.search(searchTrade);
                         cout << "Trade encontrado:\n";
@@ -165,6 +169,42 @@ void userInterface(SequenceSet& sequenceSet) {
                 break;
             }
             case 4: {
+                if (!dataImported) {
+                    cout << "Você precisa importar os dados primeiro!" << endl;
+                } else {
+                    long timeref;
+                    string account, code, countryCode, productType, status;
+                    float value;
+
+                    cout << "Digite os dados do Trade para remoção (timeref, account, code, countryCode, productType, value, status):\n";
+                    cout << "Timeref: ";
+                    cin >> timeref;
+                    cout << "Account: ";
+                    cin >> account;
+                    cout << "Code: ";
+                    cin >> code;
+                    cout << "CountryCode: ";
+                    cin >> countryCode;
+                    cout << "ProductType: ";
+                    cin >> productType;
+                    cout << "Value: ";
+                    cin >> value;
+                    cout << "Status: ";
+                    cin >> status;
+
+                    Trade removeTrade(timeref, account, code, countryCode, productType, value, status);
+
+                    try {
+                        sequenceSet.remove(removeTrade);
+                        cout << "Trade removido com sucesso!" << endl;
+                    } catch (const exception& e) {
+                        cout << "Erro: " << e.what() << endl;
+                    }
+                }
+                sequenceSet.debugPrintAllElements();
+                break;
+            }
+            case 5: {
                 // Sair
                 cout << "Saindo...\n";
                 exit = true;

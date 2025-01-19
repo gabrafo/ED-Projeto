@@ -18,6 +18,7 @@ struct Set
 
     void insert(Trade& element);
     int searchKey(const Trade& key) const;
+    void deleteElement(int pos);
     bool isInRange(const Trade& item) const;
     void quicksort(Trade elements[], int start, int end);
     int binarySearch(const Trade& item, int lastPos, bool insertion) const;

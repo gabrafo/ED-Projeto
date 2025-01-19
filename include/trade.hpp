@@ -42,5 +42,4 @@ class Trade
         void serialize(std::ofstream& out) const;
         void deserialize(std::ifstream& in);
         std::string toString() const;
-        bool equals(const Trade& other) const;
 };
