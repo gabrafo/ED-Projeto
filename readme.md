@@ -33,6 +33,3 @@ Para executar o programa:
 ```bash
 ./main
 ```
-
-## Notas de Desenvolvimento
-Atualmente, estamos em processo de adição da funcionalidade de remover elementos.
