@@ -212,36 +212,3 @@ void SequenceSet::debugPrintAllElementsFromPackage(int setId) const {
         std::cout << "Este é o último conjunto." << std::endl;
     }
 }
-
-void SequenceSet::debugPrintAllElements() const {
-    std::cout << "--- Início da depuração ---" << std::endl;
-    int currentSetId = header.firstSetId;
-
-    // Percorre todos os conjuntos enquanto houver um conjunto válido
-    while (currentSetId != -1) {
-        Set currentSet;
-        currentSet.loadSetFromFileById(currentSetId);  // Carregar o conjunto atual
-
-        std::cout << "Conjunto ID: " << currentSetId << std::endl;
-        std::cout << "Quantidade de elementos: " << currentSet.qntElements << std::endl;
-
-        // Exibe todos os elementos do conjunto atual
-        std::cout << "Elementos do conjunto " << currentSetId << ": ";
-        for (int i = 0; i < currentSet.qntElements; ++i) {
-            std::cout << currentSet.elements[i].getCountryCode() << " ";
-        }
-        std::cout << std::endl;
-
-        // Se houver um próximo conjunto, exibe o ID do próximo conjunto
-        if (currentSet.nextSetId != -1) {
-            std::cout << "Próximo conjunto ID: " << currentSet.nextSetId << std::endl;
-        } else {
-            std::cout << "Este é o último conjunto." << std::endl;
-        }
-
-        // Passa para o próximo conjunto
-        currentSetId = currentSet.nextSetId;
-    }
-
-    std::cout << "--- Fim da depuração ---" << std::endl;
-}

@@ -14,7 +14,8 @@ void displayMenu() {
     cout << "2. Inserir novo elemento\n";
     cout << "3. Buscar elemento\n";
     cout << "4. Remover elemento\n";
-    cout << "5. Sair\n";
+    cout << "5. Visualizar pacote [DEBUG]\n";
+    cout << "6. Sair\n";
 }
 
 void importDataFromCSV(const std::string& filename, SequenceSet& sequenceSet) {
@@ -195,6 +196,13 @@ void userInterface(SequenceSet& sequenceSet) {
                 break;
             }
             case 5: {
+                cout << "Digite o pacote que você quer visualizar: ";
+                int setId;
+                cin >> setId;
+                sequenceSet.debugPrintAllElementsFromPackage(setId);
+                break;
+            }
+            case 6: {
                 // Sair
                 cout << "Saindo...\n";
                 exit = true;

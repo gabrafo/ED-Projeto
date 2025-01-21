@@ -21,5 +21,4 @@ class SequenceSet
         Trade search(const Trade& searchKey) const;
         void remove(Trade element);
         void debugPrintAllElementsFromPackage(int setId) const;
-        void debugPrintAllElements() const;
 };
