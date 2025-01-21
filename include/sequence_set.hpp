@@ -12,7 +12,6 @@ class SequenceSet
     private:
         Header header;
         void splitSet(int setId);
-        void insertInSet(Set currentSet, Trade element);
 
     public:
         Header getHeader() const;

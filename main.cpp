@@ -59,9 +59,6 @@ void importDataFromCSV(const std::string& filename, SequenceSet& sequenceSet) {
         
         // Insere o elemento no conjunto
         sequenceSet.insert(trade);
-        cout << "Linha " << count << " inserida com sucesso!" << endl;
-        cout << "Elemento " << trade.getCountryCode() << " inserido." << endl;
-        cout << "---" << endl;
         count++;
     }
 }
@@ -90,11 +87,6 @@ void userInterface(SequenceSet& sequenceSet) {
                     importDataFromCSV(filename, sequenceSet);
                     dataImported = true;
                 }
-                sequenceSet.debugPrintAllElements();
-                int setId;
-                cout << "Digite o ID do conjunto para visualizar: ";
-                cin >> setId;
-                sequenceSet.debugPrintAllElementsFromPackage(setId);
                 break;
             }
             case 2: {
@@ -127,7 +119,6 @@ void userInterface(SequenceSet& sequenceSet) {
                     sequenceSet.insert(newTrade);
                     cout << "Elemento inserido com sucesso!" << endl;
                 }
-                sequenceSet.debugPrintAllElements();
                 break;
             }
             case 3: {
@@ -201,7 +192,6 @@ void userInterface(SequenceSet& sequenceSet) {
                         cout << "Erro: " << e.what() << endl;
                     }
                 }
-                sequenceSet.debugPrintAllElements();
                 break;
             }
             case 5: {
