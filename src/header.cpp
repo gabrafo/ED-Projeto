@@ -56,7 +56,6 @@ void Header::updateNextAvailableSetId() {
         // Se encontrar um set vazio, use esse ID
         if (currentSet.qntElements == 0) {
             nextAvailableSetId = currentSetId;
-            std::cout << "Conjunto vazio encontrado. Próximo ID disponível: " << nextAvailableSetId << std::endl;
             emptySetFound = true;
         }
 
@@ -66,7 +65,6 @@ void Header::updateNextAvailableSetId() {
 
     if(!emptySetFound){
         nextAvailableSetId = qntSets;
-        std::cout << "Nenhum conjunto vazio encontrado. Próximo ID disponível: " << nextAvailableSetId << std::endl;
     }
 
     saveHeaderToFile();

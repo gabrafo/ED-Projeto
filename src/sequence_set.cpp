@@ -55,12 +55,10 @@ void SequenceSet::remove(Trade element){
 
 void SequenceSet::insert(Trade element)
 {
-    std::cout << "Iniciando inserção..." << std::endl;
-
     if(header.qntSets == 0) {
         Set newSet;
         // Caso especial: nenhum conjunto ainda existe
-        std::cout << "Primeiro elemento sendo inserido..." << std::endl;
+        // Inserindo primeiro elemento
         header.firstSetId = header.nextAvailableSetId;
         header.qntSets++;
 
@@ -83,13 +81,12 @@ void SequenceSet::insert(Trade element)
 
         // Caso 1: O elemento está no intervalo do conjunto atual
         if(currentSet.isInRange(element)){
-            std::cout << "Elemento está no intervalo do set atual!" << std::endl;
 
             if(!currentSet.isFull()){
-                std::cout << "Inserindo em set com espaço disponível..." << std::endl;
+                // Set não está cheio. Inserindo elemento.
                 currentSet.insert(element);
             } else {
-                std::cout << "Set atual está cheio!" << std::endl;
+                // Set está cheio. Realizando divisão.
                 splitSet(currentSetId, element);
             }
             inserted = true;
@@ -99,28 +96,24 @@ void SequenceSet::insert(Trade element)
             nextSet.loadSetFromFileById(currentSet.nextSetId);
 
             if (element < nextSet.elements[0]) {
-                std::cout << "Elemento pertence entre os conjuntos ID " 
-                          << currentSet.setId << " e ID " << nextSet.setId << "." << std::endl;
-
                 // Inserir no conjunto atual se houver espaço
                 if (!currentSet.isFull()) {
                     currentSet.insert(element);
                     inserted = true;
                 } else {
-                    std::cout << "Conjunto ID " << currentSet.setId 
-                              << " está cheio. Realizando divisão." << std::endl;
+                    // Caso contrário, realizar divisão
                     splitSet(currentSetId, element);
                     inserted = true;
                 }
             }
         } else {
-            std::cout << "Elemento pertence ao último conjunto." << std::endl;
+            // Caso 3: O elemento é maior que todos os elementos do último conjunto
             if (!currentSet.isFull()) {
-                std::cout << "Inserindo no último conjunto..." << std::endl;
+                // Inserção no último conjunto
                 currentSet.insert(element);
                 inserted = true;
             } else {
-                std::cout << "Último conjunto está cheio. Realizando divisão." << std::endl;
+                // Último conjunto está cheio. Realizando divisão.
                 splitSet(currentSetId, element);
                 inserted = true;
             }
@@ -132,10 +125,9 @@ void SequenceSet::insert(Trade element)
     if(inserted){
         return;
     }
-
+    
+    // Inserção em novo set
     currentSetId = currentSet.setId;
-
-    std::cout << "Inserindo em novo set..." << std::endl;
 
     Set newSet(header.nextAvailableSetId, 0, -1);
     newSet.elements[0] = element;
@@ -154,7 +146,6 @@ void SequenceSet::insert(Trade element)
 
 void SequenceSet::splitSet(int currentSetId, Trade element) 
 {
-    std::cout << "Dividindo o conjunto..." << std::endl;
     Set currentSet;
     currentSet.loadSetFromFileById(currentSetId);
 
@@ -172,10 +163,8 @@ void SequenceSet::splitSet(int currentSetId, Trade element)
 
     // Inserir o elemento no conjunto correto
     if (element < newSet.elements[0]) {
-        std::cout << "Elemento pertence à metade inferior. Inserindo no conjunto atual..." << std::endl;
         currentSet.insert(element);
     } else {
-        std::cout << "Elemento pertence à metade superior. Inserindo no novo conjunto..." << std::endl;
         newSet.insert(element);
     }
 

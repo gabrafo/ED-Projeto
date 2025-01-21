@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <filesystem>
 #include <sstream>
 
 #include "header.hpp"
@@ -7,6 +8,7 @@
 #include "trade.hpp"
 
 using namespace std;
+namespace fs = std::filesystem;
 
 void displayMenu() {
     cout << "\n--- Menu ---\n";
@@ -19,49 +21,58 @@ void displayMenu() {
 }
 
 void importDataFromCSV(const std::string& filename, SequenceSet& sequenceSet) {
-    std::ifstream file(filename);
-    std::string line;
-    bool firstLine = true;
-    int count = 1;
-
-    while (std::getline(file, line)) {
-        if (firstLine) {
-            // Ignorar a primeira linha do CSV
-            firstLine = false;
-            continue;
+    try {
+        std::ifstream file(filename);
+        if (!file.is_open()) {
+            throw std::runtime_error("Erro ao abrir o arquivo CSV.");
         }
 
-        std::istringstream ss(line);
-        std::string field;
-        long timeref;
-        std::string account, code, countryCode, productType, status;
-        float value = 0.0; // Valor padrão caso a conversão falhe
+        std::string line;
+        bool firstLine = true;
+        int count = 1;
 
-        // Ler cada campo do CSV
-        std::getline(ss, field, ','); timeref = std::stol(field);  // Converte para long
-        std::getline(ss, account, ',');
-        std::getline(ss, code, ',');
-        std::getline(ss, countryCode, ',');
-        std::getline(ss, productType, ',');
-        
-        // Para o campo value, tentamos fazer a conversão para float
-        std::getline(ss, field, ',');
-        try {
-            value = std::stof(field); // Tenta converter para float
-        } catch (const std::invalid_argument& e) { // Intenção é de tratar valores vazios
-            std::cout << "Não foi possível ler o valor float" << std::endl;
-            value = 0.0f;  // Se falhar, atribui 0.0
+        while (std::getline(file, line)) {
+            if (firstLine) {
+                // Ignorar a primeira linha do CSV
+                firstLine = false;
+                continue;
+            }
+
+            std::istringstream ss(line);
+            std::string field;
+            long timeref;
+            std::string account, code, countryCode, productType, status;
+            float value = 0.0; // Valor padrão caso a conversão falhe
+
+            // Ler cada campo do CSV
+            std::getline(ss, field, ','); timeref = std::stol(field);  // Converte para long
+            std::getline(ss, account, ',');
+            std::getline(ss, code, ',');
+            std::getline(ss, countryCode, ',');
+            std::getline(ss, productType, ',');
+
+            // Para o campo value, tentamos fazer a conversão para float
+            std::getline(ss, field, ',');
+            try {
+                value = std::stof(field); // Tenta converter para float
+            } catch (const std::invalid_argument& e) { // Intenção é de tratar valores vazios
+                value = 0.0f;  // Se falhar, atribui 0.0
+            }
+
+            std::getline(ss, status, ',');
+
+            // Cria o objeto Trade
+            Trade trade(timeref, account, code, countryCode, productType, value, status);
+
+            // Insere o elemento no conjunto
+            sequenceSet.insert(trade);
+            count++;
         }
-        
-        std::getline(ss, status, ',');
-
-        // Cria o objeto Trade
-        Trade trade(timeref, account, code, countryCode, productType, value, status);
-        
-        // Insere o elemento no conjunto
-        sequenceSet.insert(trade);
-        count++;
+    } catch (const std::exception& e) {
+        std::cerr << "Erro ao importar dados do CSV: " << e.what() << std::endl;
     }
+    
+    cout << "Importação concluída com sucesso!" << endl;
 }
 
 // Função para a interface com o usuário
@@ -206,6 +217,15 @@ void userInterface(SequenceSet& sequenceSet) {
                 // Sair
                 cout << "Saindo...\n";
                 exit = true;
+
+                // Exclusão do diretório /bins e seus arquivos
+                try {
+                    if (fs::exists("bins")) {
+                        fs::remove_all("bins");
+                    }
+                } catch (const std::exception& e) {
+                    std::cerr << "Erro ao excluir o diretório /bins: " << e.what() << std::endl;
+                }
                 break;
             }
             default: {
@@ -217,6 +237,11 @@ void userInterface(SequenceSet& sequenceSet) {
 }
 
 int main() {
+        // Criação do diretório /bins se não existir
+    if (!fs::exists("bins")) {
+        fs::create_directory("bins");
+    }
+
     SequenceSet sequenceSet;
     
     // Chama a interface do usuário

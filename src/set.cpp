@@ -93,7 +93,6 @@ int Set::binarySearch(const Trade& item, int lastPos, bool insertion) const
 
 int Set::findInsertPosition(const Trade& key) const
 {
-    std::cout << "Procurando posição para inserir elemento..." << std::endl;
     return binarySearch(key, qntElements - 1, true);
 }
 
@@ -137,13 +136,6 @@ void Set::saveSetToFile() const
     std::string filename = "bins/package_" + std::to_string(setId) + ".bin";
     std::ofstream out(filename, std::ios::binary);
     serialize(out);
-    std::cout << "Salvando conjunto com ID: " << std::to_string(setId) << std::endl;
-    std::cout << "package_" << std::to_string(setId) << ".bin" << std::endl;
-    std::cout << "Quantidade de elementos: " << std::to_string(qntElements) << std::endl;
-    std::cout << "Menor countryCode: " << elements[0].getCountryCode() << std::endl;
-    std::cout << "Maior countryCode: " << elements[qntElements-1].getCountryCode() << std::endl;
-    std::cout << "Próximo arquivo: " << std::to_string(nextSetId) << std::endl;
-    std::cout << "Conjunto salvo no arquivo!" << std::endl;
 }
 
 void Set::loadSetFromFileById(int setId)
